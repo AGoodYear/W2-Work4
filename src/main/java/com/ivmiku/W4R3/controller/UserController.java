@@ -38,7 +38,6 @@ public class UserController {
     @PutMapping("/avatar")
     public String uploadAvatar(@RequestParam MultipartFile file) {
         JwtUser jwtUser = KrestUtil.getJwtUser();
-        User user = service.getUserByName(jwtUser.getUsername());
         try {
             if (file.isEmpty()){
                 return "文件为空";
@@ -59,6 +58,7 @@ public class UserController {
             }
             //写入文件
             file.transferTo(dest);
+            service.setAvatarUrl(path,jwtUser.getUsername());
             return "上传成功！";
         } catch (IOException e) {
             e.printStackTrace();

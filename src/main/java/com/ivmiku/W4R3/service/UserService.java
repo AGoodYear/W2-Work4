@@ -3,6 +3,7 @@ package com.ivmiku.W4R3.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.chenkaiwei.krest.JwtUtil;
 import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
@@ -91,8 +92,13 @@ public class UserService {
         return JSON.toJSONString(base);
     }
 
-    public String setAvatarUrl(String url) {
-
+    public String setAvatarUrl(String url, String username) {
+        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
+        userUpdateWrapper.eq("username", username);
+        User user = new User();
+        user.setAvatarUrl(url);
+        userMapper.update(user ,userUpdateWrapper);
+        return "OK";
     }
     @SneakyThrows
     public Map<String, Collection<String>> getRolePermissionMap() {
