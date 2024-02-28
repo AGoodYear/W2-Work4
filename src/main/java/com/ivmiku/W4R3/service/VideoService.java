@@ -1,6 +1,7 @@
 package com.ivmiku.W4R3.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ivmiku.W4R3.mapper.UserMapper;
 import com.ivmiku.W4R3.mapper.VideoMapper;
 import com.ivmiku.W4R3.pojo.User;
@@ -8,9 +9,7 @@ import com.ivmiku.W4R3.pojo.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class VideoService {
@@ -51,5 +50,21 @@ public class VideoService {
         HashMap<String, Object> param = new HashMap<>();
         param.put("user_id", userId);
         return videoMapper.selectByMap(param);
+    }
+
+    public List<Video> searchVideo(String keyword) {
+        QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("title", keyword);
+        List<Video> temp1 = new ArrayList<>();
+        temp1 = videoMapper.selectList(queryWrapper);
+        queryWrapper.clear();
+        queryWrapper.like("description", keyword);
+        List<Video> temp2 = new ArrayList<>();
+        temp2 = videoMapper.selectList(queryWrapper);
+        Set<Video> set = new HashSet<>();
+        set.addAll(temp1);
+        set.addAll(temp2);
+        List<Video> list = new ArrayList<>(set);
+        return list;
     }
 }

@@ -6,6 +6,7 @@ import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
 import com.ivmiku.W4R3.pojo.Base;
 import com.ivmiku.W4R3.pojo.Video;
+import com.ivmiku.W4R3.pojo.VideoInput;
 import com.ivmiku.W4R3.service.VideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,17 @@ public class VideoController {
         base.setMsg("上传成功");
         JSONObject json = new JSONObject();
         json.put("base", base);
-        return json.toString();
+        return json.toJSONString();
+    }
+
+    @PostMapping("/search")
+    public String search(@RequestBody VideoInput input) {
+        JSONObject json = new JSONObject();
+        json.put("data", service.searchVideo(input.getKeyword()));
+        Base base = new Base();
+        base.setMsg("success");
+        base.setCode(10000);
+        json.put("base", base);
+        return json.toJSONString();
     }
 }
