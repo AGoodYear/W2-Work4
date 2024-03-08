@@ -2,8 +2,8 @@ package com.ivmiku.W4R3;
 
 import com.ivmiku.W4R3.mapper.UserMapper;
 import com.ivmiku.W4R3.mapper.VideoMapper;
-import com.ivmiku.W4R3.pojo.User;
-import com.ivmiku.W4R3.pojo.Video;
+import com.ivmiku.W4R3.entity.User;
+import com.ivmiku.W4R3.entity.Video;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

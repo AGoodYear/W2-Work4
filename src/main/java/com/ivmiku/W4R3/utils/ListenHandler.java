@@ -1,6 +1,6 @@
 package com.ivmiku.W4R3.utils;
 
-import com.ivmiku.W4R3.pojo.Video;
+import com.ivmiku.W4R3.entity.Video;
 import com.ivmiku.W4R3.service.VideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

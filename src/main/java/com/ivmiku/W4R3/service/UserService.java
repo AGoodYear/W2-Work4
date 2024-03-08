@@ -7,9 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
 import com.ivmiku.W4R3.mapper.UserMapper;
-import com.ivmiku.W4R3.pojo.Base;
-import com.ivmiku.W4R3.pojo.User;
-import com.ivmiku.W4R3.pojo.UserInfo;
+import com.ivmiku.W4R3.entity.Base;
+import com.ivmiku.W4R3.entity.User;
+import com.ivmiku.W4R3.entity.UserInfo;
 import com.ivmiku.W4R3.utils.PasswordEncrypt;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public String getUser(Long id){
+    public Object getUser(Long id){
         User user = userMapper.selectById(id);
         UserInfo info = new UserInfo();
         info.getInfo(user);
@@ -30,7 +30,7 @@ public class UserService {
         JSONObject json = new JSONObject();
         json.put("base", base);
         json.put("data", info);
-        return json.toJSONString();
+        return JSON.toJSON(json);
     }
 
     public User getUserByName(String username) {
@@ -68,7 +68,7 @@ public class UserService {
         }
     }
 
-    public String register(String username, String password) {
+    public Object register(String username, String password) {
         Base base = new Base();
         User user = new User();
         user.setUsername(username);
@@ -81,20 +81,23 @@ public class UserService {
             base.setCode(-1);
             base.setMsg("用户名重复");
             e.printStackTrace();
-            return JSON.toJSONString(base);
+            return JSON.toJSON(base);
         }
         base.setCode(10000);
         base.setMsg("success");
-        return JSON.toJSONString(base);
+        return JSON.toJSON(base);
     }
 
-    public String setAvatarUrl(String url, String username) {
+    public Object setAvatarUrl(String url, String username) {
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
         userUpdateWrapper.eq("username", username);
         User user = new User();
         user.setAvatarUrl(url);
         userMapper.update(user ,userUpdateWrapper);
-        return "OK";
+        Base base = new Base();
+        base.setCode(10000);
+        base.setMsg("success");
+        return JSON.toJSON(base);
     }
     @SneakyThrows
     public Map<String, Collection<String>> getRolePermissionMap() {

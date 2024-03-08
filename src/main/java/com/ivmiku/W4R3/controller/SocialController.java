@@ -2,9 +2,9 @@ package com.ivmiku.W4R3.controller;
 
 import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
-import com.ivmiku.W4R3.pojo.SubUser;
-import com.ivmiku.W4R3.pojo.Subscribe;
-import com.ivmiku.W4R3.pojo.UserSub;
+import com.ivmiku.W4R3.entity.SubUser;
+import com.ivmiku.W4R3.entity.Subscribe;
+import com.ivmiku.W4R3.entity.UserSub;
 import com.ivmiku.W4R3.service.SocialService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

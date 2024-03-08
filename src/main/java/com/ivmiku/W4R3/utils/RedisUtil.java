@@ -1,10 +1,12 @@
 package com.ivmiku.W4R3.utils;
 
+import com.ivmiku.W4R3.entity.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -78,5 +80,13 @@ public class RedisUtil {
     public Double zscore(String key,String value){
         Double score = redisTemplate.opsForZSet().score(key, value);
         return score;
+    }
+
+    public void insertList(String key, String content) {
+        redisTemplate.opsForList().leftPush(key, content);
+    }
+
+    public List<String> getList(String key, int s, int e) {
+        return redisTemplate.opsForList().range(key, s, e);
     }
 }

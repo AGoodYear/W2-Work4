@@ -2,8 +2,8 @@ package com.ivmiku.W4R3.controller;
 
 import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
-import com.ivmiku.W4R3.pojo.User;
-import com.ivmiku.W4R3.pojo.UserInput;
+import com.ivmiku.W4R3.entity.User;
+import com.ivmiku.W4R3.entity.UserInput;
 import com.ivmiku.W4R3.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class UserController {
     private UserService service;
 
     @GetMapping("/info")
-    public String getUser(@RequestParam Long id){
+    public Object getUser(@RequestParam Long id){
         return service.getUser(id);
     }
 
@@ -31,12 +31,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody UserInput input) {
+    public Object register(@RequestBody UserInput input) {
         return service.register(input.getUsername(), input.getPassword());
     }
 
     @PutMapping("/avatar")
-    public String uploadAvatar(@RequestParam MultipartFile file) {
+    public Object uploadAvatar(@RequestParam MultipartFile file) {
         JwtUser jwtUser = KrestUtil.getJwtUser();
         try {
             if (file.isEmpty()){

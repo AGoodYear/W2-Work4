@@ -1,4 +1,4 @@
-package com.ivmiku.W4R3.pojo;
+package com.ivmiku.W4R3.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;

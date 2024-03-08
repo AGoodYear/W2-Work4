@@ -1,10 +1,10 @@
-package com.ivmiku.W4R3.pojo;
+package com.ivmiku.W4R3.entity;
 
 import lombok.Data;
 
 @Data
-public class CommentInput {
+public class ActionInput {
     private String video_id = null;
     private String comment_id = null;
-    private String content;
+    private String action_type;
 }

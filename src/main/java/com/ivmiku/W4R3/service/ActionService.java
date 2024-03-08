@@ -1,14 +1,12 @@
 package com.ivmiku.W4R3.service;
 
-import com.ivmiku.W4R3.mapper.CommentLikeMapper;
-import com.ivmiku.W4R3.mapper.CommentMapper;
-import com.ivmiku.W4R3.mapper.UserMapper;
-import com.ivmiku.W4R3.mapper.VideoLikeMapper;
-import com.ivmiku.W4R3.pojo.*;
+import com.ivmiku.W4R3.mapper.*;
+import com.ivmiku.W4R3.entity.*;
 import com.ivmiku.W4R3.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,28 +29,49 @@ public class ActionService {
     private CommentMapper commentMapper;
 
     @Autowired
+    private VideoMapper videoMapper;
+
+    @Autowired
     private RedisUtil redisUtil;
 
-    public String likeVideo(VideoLike video) {
+    @Transactional
+    public Base likeVideo(VideoLike video) {
+        Video videoEntity = videoMapper.selectById(video.getVideoid());
+        Base base = new Base();
+        if (videoEntity == null) {
+            base.setCode(10000);
+            base.setMsg("视频不存在！");
+            return base;
+        }
         videoLikeMapper.insert(video);
+        videoEntity.setLikeCount(videoEntity.getVisitCount()+1);
+        videoMapper.updateById(videoEntity);
+        base.setCode(10000);
+        base.setMsg("success");
         log.info("视频点赞成功");
-        return "OK";
+        return base;
     }
 
+    @Transactional
     public String likeComment(CommentLike comment) {
         commentLikeMapper.insert(comment);
         log.info("评论点赞成功");
         return "OK";
     }
 
+    @Transactional
     public String deleteLikeVideo(VideoLike video) {
         HashMap<String, Object> params = new HashMap<>();
-        params.put("videoid", video.getVideoId());
-        params.put("userid", video.getUserId());
+        params.put("videoid", video.getVideoid());
+        params.put("userid", video.getUserid());
         videoLikeMapper.deleteByMap(params);
+        Video videoEntity = videoMapper.selectById(video.getVideoid());
+        videoEntity.setLikeCount(videoEntity.getVisitCount()-1);
+        videoMapper.updateById(videoEntity);
         return "OK";
     }
 
+    @Transactional
     public String deleteLikeComment(CommentLike comment) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("commentid", comment.getCommentId());

@@ -4,9 +4,11 @@ package com.ivmiku.W4R3.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ivmiku.W4R3.mapper.UserMapper;
 import com.ivmiku.W4R3.mapper.VideoMapper;
-import com.ivmiku.W4R3.pojo.User;
-import com.ivmiku.W4R3.pojo.Video;
+import com.ivmiku.W4R3.entity.User;
+import com.ivmiku.W4R3.entity.Video;
+import com.ivmiku.W4R3.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,12 +21,15 @@ public class VideoService {
     @Autowired
     UserMapper userMapper;
 
+    @Autowired
+    RedisUtil redisUtil;
+
     public Video getVideoById(String videoId) {
         return videoMapper.selectById(videoId);
     }
 
     public List<Video> getAll() {
-        return Arrays.asList(videoMapper.selectById(1));
+        return videoMapper.selectList(null);
     }
 
     public Video selectById(String id) {
@@ -65,6 +70,31 @@ public class VideoService {
         set.addAll(temp1);
         set.addAll(temp2);
         List<Video> list = new ArrayList<>(set);
+        return list;
+    }
+
+    public List<Video> searchVideoByUser(String username) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        User user = userMapper.selectOne(queryWrapper);
+        QueryWrapper<Video> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("user_id", user.getId());
+        return videoMapper.selectList(queryWrapper1);
+    }
+
+    public void play(String video_id) {
+        redisUtil.zsIncr("visit_count", video_id, 1);
+    }
+
+    public List<Video> getRankList() {
+        Set<DefaultTypedTuple> set = redisUtil.zsReverseRangeWithScores("visit_count");
+        List list = new ArrayList<>();
+        set.forEach(item->{
+            DefaultTypedTuple ii= (DefaultTypedTuple)item;
+            Long id = Long.valueOf((String)ii.getValue());
+
+            list.add(selectById(id.toString()));
+        });
         return list;
     }
 }

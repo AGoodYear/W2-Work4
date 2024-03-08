@@ -1,8 +1,10 @@
 package com.ivmiku.W4R3.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
-import com.ivmiku.W4R3.pojo.*;
+import com.ivmiku.W4R3.entity.*;
 import com.ivmiku.W4R3.service.ActionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +20,15 @@ public class ActionController {
     private ActionService actionService;
 
     @PostMapping("/like")
-    public String Like(@RequestBody ActionInput input) {
+    public Object Like(@RequestBody ActionInput input) {
         JwtUser user = KrestUtil.getJwtUser();
+        Base base = new Base();
         if (input.getComment_id() == null) {
             VideoLike video = new VideoLike();
-            video.setUserId(actionService.getUserId(user.getUsername()));
-            video.setVideoId(input.getVideo_id());
+            video.setUserid(actionService.getUserId(user.getUsername()));
+            video.setVideoid(input.getVideo_id());
             if (input.getAction_type().equals("1")){
-                actionService.likeVideo(video);
+                base = actionService.likeVideo(video);
             } else {
                 actionService.deleteLikeVideo(video);
             }
@@ -39,17 +42,25 @@ public class ActionController {
                 actionService.deleteLikeComment(comment);
             }
         }
-        return "OK";
+        JSONObject json = new JSONObject();
+        json.put("base", base);
+        return JSON.toJSON(json);
     }
 
     @GetMapping("/likelist")
-    public String getLikeList(@RequestParam String id) {
+    public Object getLikeList(@RequestParam String id) {
         List<Video> list = actionService.getLikeList(id);
-        return "OK";
+        JSONObject json = new JSONObject();
+        Base base = new Base();
+        base.setCode(10000);
+        base.setMsg("success");
+        json.put("base", base);
+        json.put("data", list);
+        return JSON.toJSON(json);
     }
 
     @PostMapping("/comment")
-    public String comment(@RequestBody CommentInput input) {
+    public Object comment(@RequestBody CommentInput input) {
         JwtUser user = KrestUtil.getJwtUser();
         Comment comment = new Comment();
         comment.setContent(input.getContent());
@@ -59,19 +70,35 @@ public class ActionController {
             comment.setParent_id(input.getComment_id());
         }
         actionService.comment(comment);
-        return "OK";
+        JSONObject json = new JSONObject();
+        Base base = new Base();
+        base.setCode(10000);
+        base.setMsg("success");
+        json.put("base", base);
+        return JSON.toJSON(json);
     }
 
     @GetMapping("/getcomlist")
-    public String getCommentList(@RequestParam String video_id) {
-        actionService.getCommentList(video_id);
-        return "OK";
+    public Object getCommentList(@RequestParam String video_id) {
+        List<Comment> list = actionService.getCommentList(video_id);
+        JSONObject json = new JSONObject();
+        Base base = new Base();
+        base.setCode(10000);
+        base.setMsg("success");
+        json.put("base", base);
+        json.put("data", list);
+        return JSON.toJSON(json);
     }
 
     @DeleteMapping("delete")
-    public String deleteComment(@RequestBody CommentInput input) {
+    public Object deleteComment(@RequestBody CommentInput input) {
         actionService.deleteComment(input.getComment_id());
-        return "OK";
+        JSONObject json = new JSONObject();
+        Base base = new Base();
+        base.setCode(10000);
+        base.setMsg("success");
+        json.put("base", base);
+        return JSON.toJSON(json);
     }
 }
 

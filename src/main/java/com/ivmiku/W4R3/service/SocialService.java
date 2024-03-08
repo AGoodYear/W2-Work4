@@ -2,9 +2,9 @@ package com.ivmiku.W4R3.service;
 
 import com.ivmiku.W4R3.mapper.SubscribeMapper;
 import com.ivmiku.W4R3.mapper.UserMapper;
-import com.ivmiku.W4R3.pojo.SubUser;
-import com.ivmiku.W4R3.pojo.Subscribe;
-import com.ivmiku.W4R3.pojo.User;
+import com.ivmiku.W4R3.entity.SubUser;
+import com.ivmiku.W4R3.entity.Subscribe;
+import com.ivmiku.W4R3.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
