@@ -16,6 +16,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/api/action")
 public class ActionController {
+
     @Autowired
     private ActionService actionService;
 
@@ -37,7 +38,7 @@ public class ActionController {
             comment.setUserId(actionService.getUserId(user.getUsername()));
             comment.setCommentId(input.getComment_id());
             if (input.getAction_type().equals("1")){
-                actionService.likeComment(comment);
+                base = actionService.likeComment(comment);
             } else {
                 actionService.deleteLikeComment(comment);
             }
@@ -64,10 +65,10 @@ public class ActionController {
         JwtUser user = KrestUtil.getJwtUser();
         Comment comment = new Comment();
         comment.setContent(input.getContent());
-        comment.setUser_id(actionService.getUserId(user.getUsername()));
-        comment.setVideo_id(input.getVideo_id());
+        comment.setUserId(actionService.getUserId(user.getUsername()));
+        comment.setVideoId(input.getVideo_id());
         if (input.getComment_id() != null) {
-            comment.setParent_id(input.getComment_id());
+            comment.setParentId(input.getComment_id());
         }
         actionService.comment(comment);
         JSONObject json = new JSONObject();
@@ -90,7 +91,17 @@ public class ActionController {
         return JSON.toJSON(json);
     }
 
-    @DeleteMapping("delete")
+    @GetMapping("/getchild")
+    public Object getChildComment(@RequestParam String comment_id) {
+        List<Comment> list = actionService.getChildComment(comment_id);
+        JSONObject json = new JSONObject();
+        Base base = new Base(10000, "success");
+        json.put("base", base);
+        json.put("data", list);
+        return JSON.toJSON(json);
+    }
+
+    @DeleteMapping("/delete")
     public Object deleteComment(@RequestBody CommentInput input) {
         actionService.deleteComment(input.getComment_id());
         JSONObject json = new JSONObject();

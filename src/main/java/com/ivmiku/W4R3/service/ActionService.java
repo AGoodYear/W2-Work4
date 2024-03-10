@@ -5,6 +5,8 @@ import com.ivmiku.W4R3.entity.*;
 import com.ivmiku.W4R3.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ActionService {
     @Autowired
     private VideoLikeMapper videoLikeMapper;
@@ -39,8 +42,17 @@ public class ActionService {
         Video videoEntity = videoMapper.selectById(video.getVideoid());
         Base base = new Base();
         if (videoEntity == null) {
-            base.setCode(10000);
+            base.setCode(-1);
             base.setMsg("视频不存在！");
+            return base;
+        }
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("userid", video.getUserid());
+        params.put("videoid", video.getVideoid());
+        if (!videoLikeMapper.selectByMap(params).isEmpty()) {
+            log.error("该用户已点过赞");
+            base.setMsg("不可重复点赞！");
+            base.setCode(-1);
             return base;
         }
         videoLikeMapper.insert(video);
@@ -53,10 +65,31 @@ public class ActionService {
     }
 
     @Transactional
-    public String likeComment(CommentLike comment) {
+    public Base likeComment(CommentLike comment) {
+        Comment comment1 = commentMapper.selectById(comment.getCommentId());
+        Base base = new Base();
+        if (comment1 == null) {
+            log.error("要点赞的评论不存在！");
+            base.setMsg("评论不存在！");
+            base.setCode(-1);
+            return base;
+        }
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("user_id", comment.getUserId());
+        params.put("comment_id", comment.getCommentId());
+        if (!commentLikeMapper.selectByMap(params).isEmpty()) {
+            log.error("该用户已点过赞");
+            base.setMsg("不可重复点赞！");
+            base.setCode(-1);
+            return base;
+        }
         commentLikeMapper.insert(comment);
+        comment1.setLikeCount(comment1.getLikeCount()+1);
+        commentMapper.updateById(comment1);
         log.info("评论点赞成功");
-        return "OK";
+        base.setCode(10000);
+        base.setMsg("success");
+        return base;
     }
 
     @Transactional
@@ -87,7 +120,7 @@ public class ActionService {
         List<Video> videoList = new ArrayList<>();
         VideoService videoService = new VideoService();
         for (int i=0; i<list.size(); i++) {
-            videoList.add(videoService.getVideoById(videoList.get(i).getId()));
+            videoList.add(videoMapper.selectById(list.get(i).getVideoid()));
         }
         return videoList;
     }
@@ -100,8 +133,14 @@ public class ActionService {
         return user.getId();
     }
 
+    @Transactional
     public String comment(Comment comment) {
         commentMapper.insert(comment);
+        if (comment.getParentId() != null) {
+            Comment parentComment = commentMapper.selectById(comment.getParentId());
+            parentComment.setChildCount(parentComment.getChildCount()+1);
+            commentMapper.updateById(parentComment);
+        }
         return "OK";
     }
 
@@ -110,6 +149,12 @@ public class ActionService {
         param.put("video_id", video_id);
         List<Comment> list = commentMapper.selectByMap(param);
         return list;
+    }
+
+    public List<Comment> getChildComment(String comment_id) {
+        HashMap<String, Object> param = new HashMap<>();
+        param.put("parent_id", comment_id);
+        return commentMapper.selectByMap(param);
     }
 
     public String deleteComment(String comment_id) {

@@ -1,5 +1,7 @@
 package com.ivmiku.W4R3.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ivmiku.W4R3.entity.Base;
 import com.ivmiku.W4R3.mapper.SubscribeMapper;
 import com.ivmiku.W4R3.mapper.UserMapper;
 import com.ivmiku.W4R3.entity.SubUser;
@@ -29,17 +31,36 @@ public class SocialService {
         return user.getId();
     }
 
-    public int subscribe(Subscribe sub) {
-        subscribeMapper.insert(sub);
-        return 1;
-    }
-
-    public int delete(Subscribe sub) {
+    public Base subscribe(Subscribe sub) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", sub.getId());
         params.put("subid", sub.getSubId());
+        Base base = new Base();
+        if (!subscribeMapper.selectByMap(params).isEmpty()) {
+            base.setCode(-1);
+            base.setMsg("不可重复关注！");
+            return base;
+        }
+        subscribeMapper.insert(sub);
+        base.setCode(10000);
+        base.setMsg("success");
+        return base;
+    }
+
+    public Base delete(Subscribe sub) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("id", sub.getId());
+        params.put("subid", sub.getSubId());
+        Base base = new Base();
+        if (subscribeMapper.selectByMap(params).isEmpty()) {
+            base.setMsg("未关注该用户！");
+            base.setCode(-1);
+            return base;
+        }
         subscribeMapper.deleteByMap(params);
-        return 0;
+        base.setMsg("success");
+        base.setCode(10000);
+        return base;
     }
 
     public List<SubUser> getSubList(Long id) {
@@ -60,11 +81,11 @@ public class SocialService {
 
     public List<SubUser> getFanList(Long id) {
         HashMap<String, Object> params = new HashMap<>();
-        params.put("subid", id);
+        params.put("sub_id", id);
         List<Subscribe> list = subscribeMapper.selectByMap(params);
         List<SubUser> subList = new ArrayList<>();
         for (int i=0; i<list.size(); i++) {
-            User user = userMapper.selectById(list.get(i).getSubId());
+            User user = userMapper.selectById(list.get(i).getId());
             SubUser sb = new SubUser();
             sb.setId(user.getId());
             sb.setUsername(user.getUsername());

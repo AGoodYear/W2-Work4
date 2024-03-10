@@ -1,7 +1,10 @@
 package com.ivmiku.W4R3.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
+import com.ivmiku.W4R3.entity.Base;
 import com.ivmiku.W4R3.entity.SubUser;
 import com.ivmiku.W4R3.entity.Subscribe;
 import com.ivmiku.W4R3.entity.UserSub;
@@ -20,23 +23,48 @@ public class SocialController {
     private SocialService socialService;
 
     @PostMapping("/subscribe")
-    public String subscribe(@RequestBody UserSub sub) {
+    public Object subscribe(@RequestBody UserSub sub) {
         JwtUser user = KrestUtil.getJwtUser();
         String id = socialService.getUserId(user.getUsername());
         Subscribe subItem = new Subscribe();
-        subItem.setId(sub.getTo_user_id());
+        subItem.setId(Long.valueOf(id));
         subItem.setSubId(sub.getTo_user_id());
+        Base base = new Base();
         if (sub.getAction_type() == 1) {
-            socialService.subscribe(subItem);
+            base = socialService.subscribe(subItem);
         } else if (sub.getAction_type() == 0) {
-            socialService.delete(subItem);
+            base = socialService.delete(subItem);
         }
-        return "s";
+        return JSON.toJSON(base);
     }
-//todo
+
     @GetMapping("/sublist")
-    public String getSubList(@RequestParam Long userId) {
-        List<SubUser> list = socialService.getSubList(userId);
-        return "OK!";
+    public Object getSubList(@RequestParam Long id) {
+        List<SubUser> list = socialService.getSubList(id);
+        Base base = new Base(10000,"success");
+        JSONObject json = new JSONObject();
+        json.put("data", list);
+        json.put("base", base);
+        return JSON.toJSON(json);
+    }
+
+    @GetMapping("/fanlist")
+    public Object getFanList(@RequestParam Long id) {
+        List<SubUser> list = socialService.getFanList(id);
+        Base base = new Base(10000,"success");
+        JSONObject json = new JSONObject();
+        json.put("data", list);
+        json.put("base", base);
+        return JSON.toJSON(json);
+    }
+
+    @GetMapping("/friend")
+    public Object getFriendList(@RequestParam Long id) {
+        List<SubUser> list = socialService.getFriendList(id);
+        Base base = new Base(10000,"success");
+        JSONObject json = new JSONObject();
+        json.put("data", list);
+        json.put("base", base);
+        return JSON.toJSON(json);
     }
 }

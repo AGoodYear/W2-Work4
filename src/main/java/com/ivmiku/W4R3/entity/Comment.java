@@ -10,13 +10,13 @@ import lombok.Data;
 public class Comment {
     @TableId(type = IdType.AUTO)
     private String id;
-    private String user_id;
-    private String video_id;
-    private String parent_id;
-    private int like_count;
-    private int child_count;
+    private String userId;
+    private String videoId;
+    private String parentId;
+    private int likeCount;
+    private int childCount;
     private String content;
-    private String created_at;
-    private String updated_at;
-    private String deleted_at;
+    private String createdAt;
+    private String updatedAt;
+    private String deletedAt;
 }
