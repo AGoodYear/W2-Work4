@@ -1,7 +1,9 @@
 package com.ivmiku.W4R3.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
+import com.ivmiku.W4R3.entity.Base;
 import com.ivmiku.W4R3.entity.User;
 import com.ivmiku.W4R3.entity.UserInput;
 import com.ivmiku.W4R3.service.UserService;
@@ -40,7 +42,8 @@ public class UserController {
         JwtUser jwtUser = KrestUtil.getJwtUser();
         try {
             if (file.isEmpty()){
-                return "文件为空";
+                Base base = new Base(-1, "文件为空！");
+                return JSON.toJSON(base);
             }
             //获取文件名
             String fileName = file.getOriginalFilename();
@@ -49,7 +52,7 @@ public class UserController {
             String suffixName = fileName.substring(fileName.lastIndexOf("."));
             log.info("文件后缀名："+suffixName);
             //设置文件存储路径
-            String filePath = "d:/upload/";
+            String filePath = "/home/danmaku/";
             String path = filePath+fileName;
             File dest = new File(path);
             //检测是否存在该目录
@@ -59,10 +62,12 @@ public class UserController {
             //写入文件
             file.transferTo(dest);
             service.setAvatarUrl(path,jwtUser.getUsername());
-            return "上传成功！";
+            Base base = new Base(10000, "success");
+            return JSON.toJSON(base);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "上传失败";
+        Base base = new Base(-1, "上传失败！");
+        return JSON.toJSON(base);
     }
 }

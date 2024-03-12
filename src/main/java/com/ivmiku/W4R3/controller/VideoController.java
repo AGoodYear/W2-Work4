@@ -59,7 +59,7 @@ public class VideoController {
             return JSON.toJSON(json);
         }
         //设置文件存储路径
-        String filePath = "d:/upload/";
+        String filePath = "/home/danmaku/video";
         String path = filePath+fileName;
         File dest = new File(path);
         String path2 =filePath+cover.getOriginalFilename();
@@ -82,6 +82,7 @@ public class VideoController {
         base.setCode(10000);
         base.setMsg("上传成功");
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
@@ -90,9 +91,9 @@ public class VideoController {
         JSONObject json = new JSONObject();
         List<Video> list = new ArrayList<>();
         if (input.getKeyword() != null) {
-            list = service.searchVideo(input.getKeyword());
+            list = service.searchVideo(input.getKeyword(), input.getPage(), input.getSize());
         } else if (input.getUsername() != null) {
-            list = service.searchVideoByUser(input.getUsername());
+            list = service.searchVideoByUser(input.getUsername(), input.getPage(), input.getSize());
         }
         json.put("data", list);
         redisUtil.insertList(KrestUtil.getJwtUser().getUsername(), input.getKeyword());
@@ -100,6 +101,7 @@ public class VideoController {
         base.setMsg("success");
         base.setCode(10000);
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
@@ -112,7 +114,7 @@ public class VideoController {
         return JSON.toJSON(base);
     }
 
-    @GetMapping("rank")
+    @GetMapping("/rank")
     public Object rankList() {
         List<Video> list = service.getRankList();
         Base base = new Base();
@@ -121,6 +123,18 @@ public class VideoController {
         JSONObject json = new JSONObject();
         json.put("base", base);
         json.put("data", list);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
+        return JSON.toJSON(json);
+    }
+
+    @GetMapping("/history")
+    public Object getHistory() {
+        List<String> list = service.getSearchHistory(KrestUtil.getJwtUser().getUsername());
+        JSONObject json = new JSONObject();
+        Base base = new Base(10000,"success");
+        json.put("base", base);
+        json.put("data", list);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.DefaultTypedTuple;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -47,7 +48,7 @@ public class ListenHandler {
             Integer num = ii.getScore().intValue();
 
             Video video = videoService.selectById(id.toString());
-            if (fieldName.equals("visit_count")){
+            if ("visit_count".equals(fieldName)){
                 video.setVisitCount(num);
             }
 
@@ -55,6 +56,7 @@ public class ListenHandler {
         });
     }
     @PreDestroy
+    @Scheduled(fixedDelay = 60000)
     public void afterDestroy() {
         log.info("Redis持久化中…");
         Set<DefaultTypedTuple> visit_count = redisUtil.zsReverseRangeWithScores("visit_count");

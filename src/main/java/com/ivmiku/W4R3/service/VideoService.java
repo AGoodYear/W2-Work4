@@ -2,6 +2,7 @@ package com.ivmiku.W4R3.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ivmiku.W4R3.mapper.UserMapper;
 import com.ivmiku.W4R3.mapper.VideoMapper;
 import com.ivmiku.W4R3.entity.User;
@@ -57,11 +58,11 @@ public class VideoService {
         return videoMapper.selectByMap(param);
     }
 
-    public List<Video> searchVideo(String keyword) {
+    public List<Video> searchVideo(String keyword, int current, int size) {
         QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("title", keyword);
-        List<Video> temp1 = new ArrayList<>();
-        temp1 = videoMapper.selectList(queryWrapper);
+        Page<Video> page = new Page<>(current, size);
+        List<Video> temp1 = videoMapper.selectPage(page, queryWrapper).getRecords();
         queryWrapper.clear();
         queryWrapper.like("description", keyword);
         List<Video> temp2 = new ArrayList<>();
@@ -73,13 +74,14 @@ public class VideoService {
         return list;
     }
 
-    public List<Video> searchVideoByUser(String username) {
+    public List<Video> searchVideoByUser(String username, int current, int size) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         User user = userMapper.selectOne(queryWrapper);
         QueryWrapper<Video> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.eq("user_id", user.getId());
-        return videoMapper.selectList(queryWrapper1);
+        Page<Video> page = new Page<>(current, size);
+        return videoMapper.selectPage(page, queryWrapper1).getRecords();
     }
 
     public void play(String video_id) {
@@ -95,6 +97,11 @@ public class VideoService {
 
             list.add(selectById(id.toString()));
         });
+        return list;
+    }
+
+    public List<String> getSearchHistory(String username) {
+        List<String> list = redisUtil.getList(username, 1, 20);
         return list;
     }
 }

@@ -1,6 +1,7 @@
 package com.ivmiku.W4R3.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ivmiku.W4R3.entity.Base;
 import com.ivmiku.W4R3.mapper.SubscribeMapper;
 import com.ivmiku.W4R3.mapper.UserMapper;
@@ -63,10 +64,12 @@ public class SocialService {
         return base;
     }
 
-    public List<SubUser> getSubList(Long id) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("id", id);
-        List<Subscribe> list = subscribeMapper.selectByMap(params);
+    public List<SubUser> getSubList(Long id, int current, int size) {
+        QueryWrapper<Subscribe> queryWrapper= new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        Page<Subscribe> page = new Page<>(current, size);
+        Page<Subscribe> result = subscribeMapper.selectPage(page, queryWrapper);
+        List<Subscribe> list = new ArrayList<>(result.getRecords());
         List<SubUser> subList = new ArrayList<>();
         for (int i=0; i<list.size(); i++) {
             User user = userMapper.selectById(list.get(i).getSubId());
@@ -79,10 +82,12 @@ public class SocialService {
         return subList;
     }
 
-    public List<SubUser> getFanList(Long id) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("sub_id", id);
-        List<Subscribe> list = subscribeMapper.selectByMap(params);
+    public List<SubUser> getFanList(Long id, int current, int size) {
+        QueryWrapper<Subscribe> queryWrapper= new QueryWrapper<>();
+        queryWrapper.eq("sub_id", id);
+        Page<Subscribe> page = new Page<>(current, size);
+        Page<Subscribe> result = subscribeMapper.selectPage(page, queryWrapper);
+        List<Subscribe> list = new ArrayList<>(result.getRecords());
         List<SubUser> subList = new ArrayList<>();
         for (int i=0; i<list.size(); i++) {
             User user = userMapper.selectById(list.get(i).getId());
@@ -96,8 +101,8 @@ public class SocialService {
     }
 
     public List<SubUser> getFriendList(Long id) {
-        List<SubUser> list1 = getFanList(id);
-        List<SubUser> list2 = getSubList(id);
+        List<SubUser> list1 = getFanList(id,1,-1);
+        List<SubUser> list2 = getSubList(id,1,-1);
         list1.retainAll(list2);
         return list1;
     }

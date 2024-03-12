@@ -1,5 +1,7 @@
 package com.ivmiku.W4R3.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ivmiku.W4R3.mapper.*;
 import com.ivmiku.W4R3.entity.*;
 import com.ivmiku.W4R3.utils.RedisUtil;
@@ -113,10 +115,11 @@ public class ActionService {
         return "OK";
     }
 
-    public List<Video> getLikeList(String id) {
-        HashMap<String, Object> param = new HashMap<>();
-        param.put("userid", id);
-        List<VideoLike> list = videoLikeMapper.selectByMap(param);
+    public List<Video> getLikeList(String id, int current, int size) {
+        QueryWrapper<VideoLike> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userid", id);
+        Page<VideoLike> page = new Page<>(current, size);
+        List<VideoLike> list = videoLikeMapper.selectPage(page, queryWrapper).getRecords();
         List<Video> videoList = new ArrayList<>();
         VideoService videoService = new VideoService();
         for (int i=0; i<list.size(); i++) {

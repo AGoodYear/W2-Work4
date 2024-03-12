@@ -39,22 +39,24 @@ public class SocialController {
     }
 
     @GetMapping("/sublist")
-    public Object getSubList(@RequestParam Long id) {
-        List<SubUser> list = socialService.getSubList(id);
+    public Object getSubList(@RequestParam Long id, @RequestParam int page, @RequestParam int size) {
+        List<SubUser> list = socialService.getSubList(id, page, size);
         Base base = new Base(10000,"success");
         JSONObject json = new JSONObject();
         json.put("data", list);
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
     @GetMapping("/fanlist")
-    public Object getFanList(@RequestParam Long id) {
-        List<SubUser> list = socialService.getFanList(id);
+    public Object getFanList(@RequestParam Long id, @RequestParam int page, @RequestParam int size) {
+        List<SubUser> list = socialService.getFanList(id, page, size);
         Base base = new Base(10000,"success");
         JSONObject json = new JSONObject();
         json.put("data", list);
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
@@ -65,6 +67,7 @@ public class SocialController {
         JSONObject json = new JSONObject();
         json.put("data", list);
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 }

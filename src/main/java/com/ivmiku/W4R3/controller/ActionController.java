@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,7 @@ public class ActionController {
             VideoLike video = new VideoLike();
             video.setUserid(actionService.getUserId(user.getUsername()));
             video.setVideoid(input.getVideo_id());
-            if (input.getAction_type().equals("1")){
+            if ("1".equals(input.getAction_type())){
                 base = actionService.likeVideo(video);
             } else {
                 actionService.deleteLikeVideo(video);
@@ -37,26 +38,28 @@ public class ActionController {
             CommentLike comment = new CommentLike();
             comment.setUserId(actionService.getUserId(user.getUsername()));
             comment.setCommentId(input.getComment_id());
-            if (input.getAction_type().equals("1")){
+            if ("1".equals(input.getAction_type())){
                 base = actionService.likeComment(comment);
             } else {
                 actionService.deleteLikeComment(comment);
             }
         }
-        JSONObject json = new JSONObject();
+        JSONObject json = new JSONObject((new LinkedHashMap<>()));
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
     @GetMapping("/likelist")
-    public Object getLikeList(@RequestParam String id) {
-        List<Video> list = actionService.getLikeList(id);
+    public Object getLikeList(@RequestParam String id, @RequestParam int page, @RequestParam int size) {
+        List<Video> list = actionService.getLikeList(id, page, size);
         JSONObject json = new JSONObject();
         Base base = new Base();
         base.setCode(10000);
         base.setMsg("success");
         json.put("base", base);
         json.put("data", list);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
@@ -71,44 +74,48 @@ public class ActionController {
             comment.setParentId(input.getComment_id());
         }
         actionService.comment(comment);
-        JSONObject json = new JSONObject();
+        JSONObject json = new JSONObject((new LinkedHashMap<>()));
         Base base = new Base();
         base.setCode(10000);
         base.setMsg("success");
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
     @GetMapping("/getcomlist")
     public Object getCommentList(@RequestParam String video_id) {
         List<Comment> list = actionService.getCommentList(video_id);
-        JSONObject json = new JSONObject();
+        JSONObject json = new JSONObject((new LinkedHashMap<>()));
         Base base = new Base();
         base.setCode(10000);
         base.setMsg("success");
         json.put("base", base);
         json.put("data", list);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
     @GetMapping("/getchild")
     public Object getChildComment(@RequestParam String comment_id) {
         List<Comment> list = actionService.getChildComment(comment_id);
-        JSONObject json = new JSONObject();
+        JSONObject json = new JSONObject((new LinkedHashMap<>()));
         Base base = new Base(10000, "success");
         json.put("base", base);
         json.put("data", list);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
     @DeleteMapping("/delete")
     public Object deleteComment(@RequestBody CommentInput input) {
         actionService.deleteComment(input.getComment_id());
-        JSONObject json = new JSONObject();
+        JSONObject json = new JSONObject((new LinkedHashMap<>()));
         Base base = new Base();
         base.setCode(10000);
         base.setMsg("success");
         json.put("base", base);
+        json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 }

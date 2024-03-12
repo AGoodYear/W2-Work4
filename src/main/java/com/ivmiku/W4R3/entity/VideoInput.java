@@ -6,6 +6,6 @@ import lombok.Data;
 public class VideoInput {
     private String keyword = null;
     private String username = null;
-    private Integer page_size;
-    private Integer page_num;
+    private Integer page;
+    private Integer size;
 }

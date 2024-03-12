@@ -9,13 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author Aurora
+ */
 @Component
 public class RedisUtil {
     @Autowired
     private RedisTemplate redisTemplate;
 
     /**
-     * zet增加操作
+     * zset增加操作
      * @param key
      * @param value  属性值
      * @param map    具体分数
@@ -68,7 +71,7 @@ public class RedisUtil {
     }
 
     public Set zsReverseRangeWithScores(String key){
-        return redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
+        return redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, 20);
     }
 
     /**

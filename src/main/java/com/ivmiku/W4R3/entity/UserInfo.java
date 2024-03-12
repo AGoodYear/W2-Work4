@@ -1,14 +1,23 @@
 package com.ivmiku.W4R3.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Data;
 
 @Data
+@JSONType(alphabetic = false)
 public class UserInfo {
+    @JSONField(ordinal = 1)
     private String id;
+    @JSONField(ordinal = 2)
     private String username;
+    @JSONField(ordinal = 3)
     private String avatar_url;
+    @JSONField(ordinal = 4)
     private String created_at;
+    @JSONField(ordinal = 5)
     private String updated_at;
+    @JSONField(ordinal = 6)
     private String deleted_at;
 
     public void getInfo(User user) {
