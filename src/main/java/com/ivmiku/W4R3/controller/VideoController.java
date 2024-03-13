@@ -32,8 +32,8 @@ public class VideoController {
     private RedisUtil redisUtil;
 
     @GetMapping("/list")
-    public Object getVideoList(@RequestParam String user_id){
-        List<Video> list =  service.getList(user_id);
+    public Object getVideoList(@RequestParam String user_id, @RequestParam int page, @RequestParam int size){
+        List<Video> list =  service.getList(user_id, page, size);
         JSONObject json = new JSONObject();
         Base base = new Base();
         base.setCode(10000);
@@ -94,6 +94,8 @@ public class VideoController {
             list = service.searchVideo(input.getKeyword(), input.getPage(), input.getSize());
         } else if (input.getUsername() != null) {
             list = service.searchVideoByUser(input.getUsername(), input.getPage(), input.getSize());
+        } else if (input.getTime() != null) {
+            list = service.searchVideoByDate(input.getTime(), input.getPage(), input.getSize());
         }
         json.put("data", list);
         redisUtil.insertList(KrestUtil.getJwtUser().getUsername(), input.getKeyword());

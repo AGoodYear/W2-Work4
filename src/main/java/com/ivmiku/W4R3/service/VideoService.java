@@ -52,10 +52,11 @@ public class VideoService {
         return l.get(0);
     }
 
-    public List<Video> getList(String userId) {
-        HashMap<String, Object> param = new HashMap<>();
-        param.put("user_id", userId);
-        return videoMapper.selectByMap(param);
+    public List<Video> getList(String userId, int current, int size) {
+        QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        Page<Video> page = new Page<>(current, size);
+        return videoMapper.selectPage(page, queryWrapper).getRecords();
     }
 
     public List<Video> searchVideo(String keyword, int current, int size) {
@@ -82,6 +83,13 @@ public class VideoService {
         queryWrapper1.eq("user_id", user.getId());
         Page<Video> page = new Page<>(current, size);
         return videoMapper.selectPage(page, queryWrapper1).getRecords();
+    }
+
+    public List<Video> searchVideoByDate(String time, int current, int size) {
+        QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("created_at", time);
+        Page<Video> page = new Page<>(current, size);
+        return videoMapper.selectPage(page, queryWrapper).getRecords();
     }
 
     public void play(String video_id) {
