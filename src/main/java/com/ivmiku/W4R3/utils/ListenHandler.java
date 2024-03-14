@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author Aurora
+ */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
@@ -30,6 +33,9 @@ public class ListenHandler {
         log.info("Redis初始化…");
     }
 
+    /**
+     * 项目启动前将Mysql中的播放量数据写入Redis
+     */
     @PostConstruct
     public void init() {
         List<Video> videoList = videoService.getAll();
@@ -41,6 +47,11 @@ public class ListenHandler {
         log.info("写入Redis成功");
     }
 
+    /**
+     * 将Redis中的对象匹配并写入Mysql
+     * @param set ZSet集合
+     * @param fieldName 要写入的栏名
+     */
     public void writeNum(Set<DefaultTypedTuple> set, String fieldName) {
         set.forEach(item->{
             DefaultTypedTuple ii= (DefaultTypedTuple)item;
@@ -55,6 +66,10 @@ public class ListenHandler {
             videoService.updateInfo(video);
         });
     }
+
+    /**
+     * 定时Redis写入Mysql
+     */
     @PreDestroy
     @Scheduled(fixedDelay = 60000)
     public void afterDestroy() {

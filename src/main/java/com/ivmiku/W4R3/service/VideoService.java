@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * @author Aurora
+ */
 @Service
 public class VideoService {
     @Autowired
@@ -59,6 +62,13 @@ public class VideoService {
         return videoMapper.selectPage(page, queryWrapper).getRecords();
     }
 
+    /**
+     * 关键词搜索视频
+     * @param keyword 关键词
+     * @param current 分页参数
+     * @param size 分页参数
+     * @return 视频列表
+     */
     public List<Video> searchVideo(String keyword, int current, int size) {
         QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("title", keyword);
@@ -75,6 +85,13 @@ public class VideoService {
         return list;
     }
 
+    /**
+     * 根据用户搜索视频
+     * @param username 用户名称
+     * @param current 分页参数
+     * @param size 分页参数
+     * @return 视频列表
+     */
     public List<Video> searchVideoByUser(String username, int current, int size) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
@@ -85,6 +102,13 @@ public class VideoService {
         return videoMapper.selectPage(page, queryWrapper1).getRecords();
     }
 
+    /**
+     * 根据日期搜索
+     * @param time “yyyy-mm-dd”
+     * @param current 分页参数
+     * @param size 分页参数
+     * @return 视频列表
+     */
     public List<Video> searchVideoByDate(String time, int current, int size) {
         QueryWrapper<Video> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("created_at", time);
@@ -96,6 +120,10 @@ public class VideoService {
         redisUtil.zsIncr("visit_count", video_id, 1);
     }
 
+    /**
+     * 获取排行榜
+     * @return 视频播放排行
+     */
     public List<Video> getRankList() {
         Set<DefaultTypedTuple> set = redisUtil.zsReverseRangeWithScores("visit_count");
         List list = new ArrayList<>();
@@ -108,6 +136,11 @@ public class VideoService {
         return list;
     }
 
+    /**
+     * 获取获取搜索历史
+     * @param username 用户名
+     * @return 20条搜索记录
+     */
     public List<String> getSearchHistory(String username) {
         List<String> list = redisUtil.getList(username, 1, 20);
         return list;

@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Aurora
+ */
 @Slf4j
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -39,7 +42,12 @@ public class ActionService {
     @Autowired
     private RedisUtil redisUtil;
 
-    @Transactional
+    /**
+     * 视频点赞
+     * @param video 包含点赞视频信息的实体
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
     public Base likeVideo(VideoLike video) {
         Video videoEntity = videoMapper.selectById(video.getVideoid());
         Base base = new Base();
@@ -66,7 +74,12 @@ public class ActionService {
         return base;
     }
 
-    @Transactional
+    /**
+     * 评论点赞
+     * @param comment 要点赞的评论信息
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
     public Base likeComment(CommentLike comment) {
         Comment comment1 = commentMapper.selectById(comment.getCommentId());
         Base base = new Base();
@@ -94,27 +107,46 @@ public class ActionService {
         return base;
     }
 
-    @Transactional
-    public String deleteLikeVideo(VideoLike video) {
-        HashMap<String, Object> params = new HashMap<>();
+    /**
+     * 取消视频点赞
+     * @param video 要操作的视频对象信息
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Base deleteLikeVideo(VideoLike video) {
+        HashMap<String, Object> params = new HashMap<>(2);
         params.put("videoid", video.getVideoid());
         params.put("userid", video.getUserid());
         videoLikeMapper.deleteByMap(params);
         Video videoEntity = videoMapper.selectById(video.getVideoid());
         videoEntity.setLikeCount(videoEntity.getVisitCount()-1);
         videoMapper.updateById(videoEntity);
-        return "OK";
+        Base base = new Base(10000, "success");
+        return base;
     }
 
-    @Transactional
-    public String deleteLikeComment(CommentLike comment) {
+    /**
+     * 取消评论点赞
+     *
+     * @param comment 评论信息
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Base deleteLikeComment(CommentLike comment) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("commentid", comment.getCommentId());
         params.put("userid", comment.getUserId());
         videoLikeMapper.deleteByMap(params);
-        return "OK";
+        return new Base(10000, "success");
     }
 
+    /**
+     * 获取点赞列表
+     * @param id 用户id
+     * @param current 分页参数
+     * @param size 分页参数
+     * @return 点赞列表
+     */
     public List<Video> getLikeList(String id, int current, int size) {
         QueryWrapper<VideoLike> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userid", id);
@@ -128,6 +160,11 @@ public class ActionService {
         return videoList;
     }
 
+    /**
+     * 获取用户id
+     * @param username 用户名
+     * @return 用户id
+     */
     public String getUserId(String username) {
         Map<String, Object> params = new HashMap<>();
         params.put("username", username);
@@ -136,32 +173,59 @@ public class ActionService {
         return user.getId();
     }
 
-    @Transactional
-    public String comment(Comment comment) {
+    /**
+     * 评论
+     *
+     * @param comment 评论实体
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Base comment(Comment comment) {
         commentMapper.insert(comment);
         if (comment.getParentId() != null) {
             Comment parentComment = commentMapper.selectById(comment.getParentId());
             parentComment.setChildCount(parentComment.getChildCount()+1);
             commentMapper.updateById(parentComment);
         }
-        return "OK";
+        return new Base(10000, "success");
     }
 
-    public List<Comment> getCommentList(String video_id) {
-        HashMap<String, Object> param = new HashMap<>();
-        param.put("video_id", video_id);
-        List<Comment> list = commentMapper.selectByMap(param);
+    /**
+     * 获取视频评论列表
+     * @param video_id 视频id
+     * @param current 分页参数
+     * @param size 分页参数
+     * @return 评论列表
+     */
+    public List<Comment> getCommentList(String video_id, int current, int size) {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("video_id", video_id);
+        Page<Comment> page = new Page<>(current,size);
+        List<Comment> list = commentMapper.selectPage(page,queryWrapper).getRecords();
         return list;
     }
 
+    /**
+     * 获取子评论
+     * @param comment_id 评论id
+     * @return 子评论列表
+     */
     public List<Comment> getChildComment(String comment_id) {
         HashMap<String, Object> param = new HashMap<>();
         param.put("parent_id", comment_id);
         return commentMapper.selectByMap(param);
     }
 
-    public String deleteComment(String comment_id) {
+    /**
+     * 删除评论
+     * @param comment_id 删除的评论id
+     * @return 执行结果
+     */
+    public Base deleteComment(String comment_id) {
+        if (commentMapper.selectById(comment_id) == null) {
+            return new Base(-1, "评论不存在！");
+        }
         commentMapper.deleteById(comment_id);
-        return "ok";
+        return new Base(10000, "success");
     }
 }

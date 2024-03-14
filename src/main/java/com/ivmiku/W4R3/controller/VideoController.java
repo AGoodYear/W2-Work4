@@ -21,6 +21,9 @@ import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Aurora
+ */
 @RestController
 @RequestMapping("/api/video")
 @Slf4j
@@ -31,6 +34,13 @@ public class VideoController {
     @Autowired
     private RedisUtil redisUtil;
 
+    /**
+     * 获取用户上传的视频列表
+     * @param user_id 用户id
+     * @param page 分页参数
+     * @param size 分页参数
+     * @return 视频列表
+     */
     @GetMapping("/list")
     public Object getVideoList(@RequestParam String user_id, @RequestParam int page, @RequestParam int size){
         List<Video> list =  service.getList(user_id, page, size);
@@ -43,6 +53,15 @@ public class VideoController {
         return JSON.toJSON(json);
     }
 
+    /**
+     * 投稿
+     * @param file 视频文件
+     * @param cover 视频封面
+     * @param title 视频标题
+     * @param description 视频描述
+     * @return 操作结果
+     * @throws IOException 上传异常
+     */
     @PostMapping("/upload")
     public Object upload(@RequestPart("file") MultipartFile file, @RequestPart("cover") MultipartFile cover, @RequestParam("title") String title, @RequestParam("description") String description) throws IOException {
         //获取文件名
@@ -86,6 +105,11 @@ public class VideoController {
         return JSON.toJSON(json);
     }
 
+    /**
+     * 搜索视频
+     * @param input VideoInput， 根据输入的条件不同查询视频
+     * @return 视频列表
+     */
     @PostMapping("/search")
     public Object search(@RequestBody VideoInput input) {
         JSONObject json = new JSONObject();
@@ -107,6 +131,11 @@ public class VideoController {
         return JSON.toJSON(json);
     }
 
+    /**
+     * 播放（播放量+1）
+     * @param video_id 视频id
+     * @return 执行结果
+     */
     @GetMapping("play")
     public Object play(@RequestParam String video_id) {
         service.play(video_id);
@@ -116,6 +145,10 @@ public class VideoController {
         return JSON.toJSON(base);
     }
 
+    /**
+     * 视频排行榜
+     * @return 视频排行
+     */
     @GetMapping("/rank")
     public Object rankList() {
         List<Video> list = service.getRankList();
@@ -129,6 +162,10 @@ public class VideoController {
         return JSON.toJSON(json);
     }
 
+    /**
+     * 搜索历史
+     * @return 搜索历史关键词20个
+     */
     @GetMapping("/history")
     public Object getHistory() {
         List<String> list = service.getSearchHistory(KrestUtil.getJwtUser().getUsername());

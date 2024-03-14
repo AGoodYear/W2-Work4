@@ -85,10 +85,22 @@ public class RedisUtil {
         return score;
     }
 
+    /**
+     * List插入操作
+     * @param key 键
+     * @param content 内容
+     */
     public void insertList(String key, String content) {
         redisTemplate.opsForList().leftPush(key, content);
     }
 
+    /**
+     * List返回操作
+     * @param key 键
+     * @param s 开始
+     * @param e 结束
+     * @return 查询的List列表
+     */
     public List<String> getList(String key, int s, int e) {
         return redisTemplate.opsForList().range(key, s, e);
     }

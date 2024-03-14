@@ -21,6 +21,11 @@ public class ActionController {
     @Autowired
     private ActionService actionService;
 
+    /**
+     * 点赞
+     * @param input Actioninput结构体
+     * @return 执行结果
+     */
     @PostMapping("/like")
     public Object Like(@RequestBody ActionInput input) {
         JwtUser user = KrestUtil.getJwtUser();
@@ -32,7 +37,7 @@ public class ActionController {
             if ("1".equals(input.getAction_type())){
                 base = actionService.likeVideo(video);
             } else {
-                actionService.deleteLikeVideo(video);
+                base = actionService.deleteLikeVideo(video);
             }
         } else if (input.getVideo_id() == null) {
             CommentLike comment = new CommentLike();
@@ -41,7 +46,7 @@ public class ActionController {
             if ("1".equals(input.getAction_type())){
                 base = actionService.likeComment(comment);
             } else {
-                actionService.deleteLikeComment(comment);
+                base = actionService.deleteLikeComment(comment);
             }
         }
         JSONObject json = new JSONObject((new LinkedHashMap<>()));
@@ -50,6 +55,13 @@ public class ActionController {
         return JSON.toJSON(json);
     }
 
+    /**
+     *
+     * @param id 用户ID
+     * @param page 分页页数
+     * @param size 分页大小
+     * @return
+     */
     @GetMapping("/likelist")
     public Object getLikeList(@RequestParam String id, @RequestParam int page, @RequestParam int size) {
         List<Video> list = actionService.getLikeList(id, page, size);
@@ -63,6 +75,11 @@ public class ActionController {
         return JSON.toJSON(json);
     }
 
+    /**
+     *
+     * @param input CommentInput结构体
+     * @return 执行结果
+     */
     @PostMapping("/comment")
     public Object comment(@RequestBody CommentInput input) {
         JwtUser user = KrestUtil.getJwtUser();
@@ -73,19 +90,23 @@ public class ActionController {
         if (input.getComment_id() != null) {
             comment.setParentId(input.getComment_id());
         }
-        actionService.comment(comment);
+        Base base = actionService.comment(comment);
         JSONObject json = new JSONObject((new LinkedHashMap<>()));
-        Base base = new Base();
-        base.setCode(10000);
-        base.setMsg("success");
         json.put("base", base);
         json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);
     }
 
+    /**
+     *
+     * @param video_id 要获取评论的视频id
+     * @param page 分页参数
+     * @param size 分页参数
+     * @return 评论列表
+     */
     @GetMapping("/getcomlist")
-    public Object getCommentList(@RequestParam String video_id) {
-        List<Comment> list = actionService.getCommentList(video_id);
+    public Object getCommentList(@RequestParam String video_id, @RequestParam int page, @RequestParam int size) {
+        List<Comment> list = actionService.getCommentList(video_id, page, size);
         JSONObject json = new JSONObject((new LinkedHashMap<>()));
         Base base = new Base();
         base.setCode(10000);
@@ -96,6 +117,11 @@ public class ActionController {
         return JSON.toJSON(json);
     }
 
+    /**
+     *
+     * @param comment_id 要获取子评论的评论id
+     * @return 子评论列表
+     */
     @GetMapping("/getchild")
     public Object getChildComment(@RequestParam String comment_id) {
         List<Comment> list = actionService.getChildComment(comment_id);
@@ -107,13 +133,15 @@ public class ActionController {
         return JSON.toJSON(json);
     }
 
+    /**
+     *
+     * @param input Commentinput结构体
+     * @return 执行结构
+     */
     @DeleteMapping("/delete")
     public Object deleteComment(@RequestBody CommentInput input) {
-        actionService.deleteComment(input.getComment_id());
+        Base base = actionService.deleteComment(input.getComment_id());
         JSONObject json = new JSONObject((new LinkedHashMap<>()));
-        Base base = new Base();
-        base.setCode(10000);
-        base.setMsg("success");
         json.put("base", base);
         json.put("token", KrestUtil.createNewJwtTokenIfNeeded());
         return JSON.toJSON(json);

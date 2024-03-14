@@ -17,11 +17,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * @author Aurora
+ */
 @Service
 public class UserService {
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * 获取用户
+     * @param id
+     * @return json信息
+     */
     public Object getUser(Long id){
         User user = userMapper.selectById(id);
         UserInfo info = new UserInfo();
@@ -33,12 +41,20 @@ public class UserService {
         return JSON.toJSON(json);
     }
 
+
     public User getUserByName(String username) {
         HashMap<String, Object> param = new HashMap<>();
         param.put("username", username);
         List<User> l = userMapper.selectByMap(param);
         return l.get(0);
     }
+
+    /**
+     * 登录
+     * @param username 用户名
+     * @param password 密码
+     * @return 操作结果
+     */
     public Object login(String username, String password){
         Base base = new Base();
         Map<String, Object> params = new HashMap<>();
@@ -68,6 +84,12 @@ public class UserService {
         }
     }
 
+    /**
+     * 注册
+     * @param username 用户名
+     * @param password 密码
+     * @return 操作结果
+     */
     public Object register(String username, String password) {
         Base base = new Base();
         User user = new User();
@@ -88,6 +110,12 @@ public class UserService {
         return JSON.toJSON(base);
     }
 
+    /**
+     * 设置头像链接
+     * @param url 头像url
+     * @param username 用户名
+     * @return 操作结果
+     */
     public Object setAvatarUrl(String url, String username) {
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
         userUpdateWrapper.eq("username", username);
@@ -99,6 +127,11 @@ public class UserService {
         base.setMsg("success");
         return JSON.toJSON(base);
     }
+
+    /**
+     * 权限配置
+     * @return 权限Hashmap
+     */
     @SneakyThrows
     public Map<String, Collection<String>> getRolePermissionMap() {
 

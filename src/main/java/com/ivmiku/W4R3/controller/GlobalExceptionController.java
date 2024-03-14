@@ -18,22 +18,26 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionController {
 
-    //按你自己的方式来统一返回格式，此处仅做示例，为了好懂就不抽象了。
+
     @ExceptionHandler({KrestAuthenticationException.class,AuthenticationException.class})
     public ResponseEntity KrestAuthenticationExceptionHandler(KrestAuthenticationException e) {
         log.error("krestExceptionHandler");
         log.error(e.getLocalizedMessage());
 
         Map<String,Object> body=new HashMap<String,Object>();
-        body.put("status",HttpStatus.FORBIDDEN.value());//也可以自定义更详细的状态码
+        body.put("status",HttpStatus.FORBIDDEN.value());
         body.put("message",e.getLocalizedMessage());
         body.put("exception",e.getClass().getName());
         body.put("error",HttpStatus.FORBIDDEN.getReasonPhrase());
-        return new ResponseEntity(body, HttpStatus.FORBIDDEN);//仅是示例，按需求定义
+        return new ResponseEntity(body, HttpStatus.FORBIDDEN);
     }
 
 
-    //权限验证错误
+    /**
+     * 权限验证错误
+     * @param e
+     * @return
+     */
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity unauthorizedExceptionHandler(UnauthorizedException e) {
         log.error("unauthorizedExceptionHandler");
@@ -44,8 +48,14 @@ public class GlobalExceptionController {
         body.put("message",e.getLocalizedMessage());
         body.put("exception",e.getClass().getName());
         body.put("error",HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        return new ResponseEntity(body, HttpStatus.UNAUTHORIZED);//仅是示例，按需求定义
+        return new ResponseEntity(body, HttpStatus.UNAUTHORIZED);
     }
+
+    /**
+     * 普通错误处理
+     * @param e
+     * @return
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity exceptionHandler(Exception e) {
         log.error("exceptionHandler");
@@ -56,6 +66,6 @@ public class GlobalExceptionController {
         body.put("message",e.getLocalizedMessage());
         body.put("exception",e.getClass().getName());
         body.put("error",HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        return new ResponseEntity(body, HttpStatus.INTERNAL_SERVER_ERROR);//仅是示例，按需求定义
+        return new ResponseEntity(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -7,6 +7,10 @@ import org.springframework.stereotype.Controller;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+/**
+ * 错误返回类
+ * @author Aurora
+ */
 @Slf4j
 @Controller
 public class ErrorController extends KrestErrorController {

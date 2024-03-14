@@ -4,6 +4,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Data;
 
+/**
+ * @author Aurora
+ */
 @Data
 @JSONType(alphabetic = false)
 public class UserInfo {

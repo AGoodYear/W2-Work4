@@ -6,7 +6,7 @@
 
 ## 技术栈
 
-Mysql、SpringBoot（2.6.15）、Mybatis-Plus、Krest（一款整合了Shiro和Jwt的安全框架）
+Mysql、SpringBoot（2.6.15）、Mybatis-Plus、Krest（一款整合了Shiro和Jwt的安全框架）、FastJSON
 
 ## 项目结构
 
@@ -28,11 +28,17 @@ Mysql、SpringBoot（2.6.15）、Mybatis-Plus、Krest（一款整合了Shiro和J
 
 ## 项目亮点
 
+当Token达到设定的时间时，会自动生成新的Token并返回
+
+基本完成了考核文档中的任务，详见接口文档
+
 ## 存在的问题
 
-Redis和Mysql的数据一致性目前采用Redis项目关闭时写入Mysql的方案，一定程度上可能会导致额外的性能开销
+Redis和Mysql的数据一致性目前采用Redis项目定时写入Mysql的方案，一定程度上可能会导致额外的性能开销
 
-Krest框架一定程度上限制了项目后续的改造以及
+Krest框架一定程度上限制了项目后续的改造以及发展
+
+视频搜素不支持联合搜索，
 
 
 

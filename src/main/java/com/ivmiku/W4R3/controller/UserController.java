@@ -22,21 +22,41 @@ public class UserController {
     @Autowired
     private UserService service;
 
+    /**
+     * 获取用户信息
+     * @param id 用户id
+     * @return 用户信息
+     */
     @GetMapping("/info")
     public Object getUser(@RequestParam Long id){
         return service.getUser(id);
     }
 
+    /**
+     * 登录
+     * @param user UserInput
+     * @return 操作结果
+     */
     @PostMapping("/login")
     public Object login(@RequestBody User user) {
         return service.login(user.getUsername(), user.getPassword());
     }
 
+    /**
+     * 注册
+     * @param input UserInput
+     * @return 操作结果
+     */
     @PostMapping("/register")
     public Object register(@RequestBody UserInput input) {
         return service.register(input.getUsername(), input.getPassword());
     }
 
+    /**
+     * 上传头像
+     * @param file 要上传的头像文件
+     * @return 操作结果
+     */
     @PutMapping("/avatar")
     public Object uploadAvatar(@RequestParam MultipartFile file) {
         JwtUser jwtUser = KrestUtil.getJwtUser();
@@ -52,7 +72,7 @@ public class UserController {
             String suffixName = fileName.substring(fileName.lastIndexOf("."));
             log.info("文件后缀名："+suffixName);
             //设置文件存储路径
-            String filePath = "/home/danmaku/";
+            String filePath = "/home/danmaku/avatar/";
             String path = filePath+fileName;
             File dest = new File(path);
             //检测是否存在该目录

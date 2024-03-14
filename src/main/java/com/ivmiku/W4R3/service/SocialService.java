@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Aurora
+ */
 @Service
 public class SocialService {
     @Autowired
@@ -24,6 +27,11 @@ public class SocialService {
     @Autowired
     private SubscribeMapper subscribeMapper;
 
+    /**
+     * 获取用户id
+     * @param username 用户名
+     * @return 用户id
+     */
     public String getUserId(String username) {
         Map<String, Object> params = new HashMap<>();
         params.put("username", username);
@@ -32,6 +40,11 @@ public class SocialService {
         return user.getId();
     }
 
+    /**
+     * 关注
+     * @param sub 关注操作相关信息
+     * @return 操作结果
+     */
     public Base subscribe(Subscribe sub) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", sub.getId());
@@ -48,6 +61,11 @@ public class SocialService {
         return base;
     }
 
+    /**
+     * 取关
+     * @param sub 关注操作相关信息
+     * @return 操作结果
+     */
     public Base delete(Subscribe sub) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", sub.getId());
@@ -64,6 +82,13 @@ public class SocialService {
         return base;
     }
 
+    /**
+     * 获取关注列表
+     * @param id 用户id
+     * @param current 分页参数
+     * @param size 分页参数
+     * @return 关注列表
+     */
     public List<SubUser> getSubList(Long id, int current, int size) {
         QueryWrapper<Subscribe> queryWrapper= new QueryWrapper<>();
         queryWrapper.eq("id", id);
@@ -82,6 +107,13 @@ public class SocialService {
         return subList;
     }
 
+    /**
+     * 获取粉丝列表
+     * @param id 用户id
+     * @param current 分页参数
+     * @param size 分页参数
+     * @return 用户列表
+     */
     public List<SubUser> getFanList(Long id, int current, int size) {
         QueryWrapper<Subscribe> queryWrapper= new QueryWrapper<>();
         queryWrapper.eq("sub_id", id);
@@ -100,6 +132,11 @@ public class SocialService {
         return subList;
     }
 
+    /**
+     * 获取朋友列表
+     * @param id 用户id
+     * @return 朋友列表
+     */
     public List<SubUser> getFriendList(Long id) {
         List<SubUser> list1 = getFanList(id,1,-1);
         List<SubUser> list2 = getSubList(id,1,-1);
