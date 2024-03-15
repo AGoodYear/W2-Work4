@@ -1,5 +1,8 @@
 package com.ivmiku.W4R3;
 
+import com.ivmiku.W4R3.controller.ActionController;
+import com.ivmiku.W4R3.entity.ActionInput;
+import com.ivmiku.W4R3.entity.CommentLike;
 import com.ivmiku.W4R3.mapper.UserMapper;
 import com.ivmiku.W4R3.mapper.VideoMapper;
 import com.ivmiku.W4R3.entity.User;
@@ -20,6 +23,8 @@ class W4R3ApplicationTests {
 	private VideoMapper videoMapper;
 	@Autowired
 	private UserMapper user;
+	@Autowired
+	private ActionController actionController;
 	@Test
 	public void test1() {
 		Video video = videoMapper.selectById("1");
@@ -27,5 +32,14 @@ class W4R3ApplicationTests {
 		User u = user.selectById("1755469837687713793");
 		System.out.println(u.getUsername());
 	}
+
+//	@Test
+//	public void testLike() {
+//		ActionInput actionInput = new ActionInput();
+//		actionInput.setAction_type("1");
+//		actionInput.setComment_id("2");
+//		System.out.println(actionController.Like(actionInput));
+//
+//	}
 
 }

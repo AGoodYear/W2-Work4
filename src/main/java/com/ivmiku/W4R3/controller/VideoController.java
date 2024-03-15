@@ -71,7 +71,7 @@ public class VideoController {
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
         Base base = new Base();
         JSONObject json = new JSONObject();
-        if (suffixName != "mp4") {
+        if (!".mp4".equals(suffixName)) {
             base.setCode(-1);
             base.setMsg("上传的文件非mp4格式文件");
             json.put("base", base);
@@ -116,13 +116,15 @@ public class VideoController {
         List<Video> list = new ArrayList<>();
         if (input.getKeyword() != null) {
             list = service.searchVideo(input.getKeyword(), input.getPage(), input.getSize());
+            redisUtil.insertList(KrestUtil.getJwtUser().getUsername(), input.getKeyword());
         } else if (input.getUsername() != null) {
             list = service.searchVideoByUser(input.getUsername(), input.getPage(), input.getSize());
+            redisUtil.insertList(KrestUtil.getJwtUser().getUsername(), input.getUsername());
         } else if (input.getTime() != null) {
             list = service.searchVideoByDate(input.getTime(), input.getPage(), input.getSize());
+            redisUtil.insertList(KrestUtil.getJwtUser().getUsername(), input.getTime());
         }
         json.put("data", list);
-        redisUtil.insertList(KrestUtil.getJwtUser().getUsername(), input.getKeyword());
         Base base = new Base();
         base.setMsg("success");
         base.setCode(10000);
